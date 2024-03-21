@@ -23,3 +23,8 @@ body {
 .highlight {
     color: mediumpurple;
 }
+
+.navbar li > a:hover, .navbar li > a:focus {
+    background-color: rgba(126, 126, 255, 0.1);
+    border-radius: 5px;
+}
