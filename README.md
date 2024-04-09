@@ -2,7 +2,6 @@
 Harmonix utilizes AI to generate playlists based on thematic prompts or existing tracks/artists.
 
 ## How to Use:
-### Step 1
 I have ignored the appsettings.json file for security purposes, so you will need to create your own in order to link you API Keys
 
  1. Create a file called `appsettings.json` in the root directory
