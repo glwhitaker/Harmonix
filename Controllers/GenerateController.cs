@@ -39,7 +39,7 @@ namespace Harmonix.Controllers
                 model = "gpt-4",
                 messages = new object[]
                 {
-                    new { role = "system", content = $"Given the user's input of {query}, generate a playlist of 25 songs from Spotify that match the provided {query}. The playlist should include a curated selection of tracks by various artists, ensuring a cohesive listening experience for the user. Return a list of songs with the format: title - artist."},
+                    new { role = "system", content = $"Given the user's input of: {query}, generate a playlist of 25 songs from Spotify that match this vibe: {query}. The playlist should include a curated selection of tracks by various artists, ensuring a cohesive listening experience for the user. Return a list of songs with the format: title - artist"},
                     new { role = "user", content = query}
                 },
                 temperature = 0,

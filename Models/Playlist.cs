@@ -23,7 +23,10 @@ namespace Harmonix.Models
             foreach (string song in songList)
             {
                 string[] songInfo = song.Split("-");
-                Songs.Add(new Song(songInfo[0], songInfo[1]));
+                // ignore numbers like "1. " as well as any quotation marks
+                string title = songInfo[0].Trim().TrimStart('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', ' ', '"').TrimEnd('"');
+                string artist = songInfo[1].Trim();
+                Songs.Add(new Song(title, artist));
             }
         }
     }
