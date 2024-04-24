@@ -1,6 +1,4 @@
-﻿using System.Xml.Serialization;
-
-namespace Harmonix.DTOs
+﻿namespace Harmonix.DTOs
 {
     public class OpenAIResponse
     {

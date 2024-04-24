@@ -2,20 +2,21 @@
 using Harmonix.DTOs;
 using Harmonix.Models;
 using Newtonsoft.Json;
-using System.Diagnostics;
 using System.Text;
 
 namespace Harmonix.Controllers
 {
     public class GenerateController : Controller
     {
+        private readonly IHttpContextAccessor _context;
         private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
 
-        public GenerateController(IConfiguration configuration, HttpClient httpClient)
+        public GenerateController(IConfiguration configuration, HttpClient httpClient, IHttpContextAccessor context)
         {
             _configuration = configuration;
             _httpClient = httpClient;
+            _context = context;
         }
 
         public IActionResult Index()

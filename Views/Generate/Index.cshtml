@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@inject IHttpContextAccessor _context;
+
+<!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="utf-8">
@@ -8,8 +10,9 @@
 </head>
 
 <div class="container mb-6">
+    <h3 class="d-flex justify-content-center">Hello!</h3>
     <div class="row md-3">
-        <div class="col justify-content-lg-center shadow p-3 rounded">
+        <div class="col justify-content-lg-center shadow p-3 rounded mb-3">
             <form method="post" action="@Url.Action("generateMoodPlaylist")">
 
                 <div class="form-group w-50">
@@ -29,7 +32,7 @@
 
             @if (ViewBag.Playlist != null)
             {
-                <div class="my-4">
+                <div class="my-3">
                     <h2>@ViewBag.Playlist.Name</h2>
                     <div class="alert alert-info">
                         @foreach (var song in ViewBag.Playlist.Songs)
@@ -40,5 +43,6 @@
                 </div>
             }
         </div>
+        <h2>Your Top Tracks:</h2>
     </div>
 </div>

@@ -1,38 +1,76 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SpotifyAPI.Web;
 
 namespace Harmonix.Controllers
 {
     public class SpotifyController : Controller
     {
+        private readonly IHttpContextAccessor _context;
         private readonly IConfiguration _configuration;
-        private readonly HttpClient _httpClient;
-        public SpotifyController(IConfiguration configuration, HttpClient httpClient)
+        public SpotifyController(IConfiguration configuration, IHttpContextAccessor context)
         {
             _configuration = configuration;
-            _httpClient = httpClient;
+            _context = context;
         }
         public IActionResult Index()
         {
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AuthUserAsync()
+        public IActionResult UserLogin()
         {
-            var spotify = new SpotifyClient("{Spotify.ClientSecret}");
+            // Generates a secure random verifier of length 100 and its challenge
+            var (verifier, challenge) = PKCEUtil.GenerateCodes();
 
-            var me = await spotify.UserProfile.Current();
-            Console.WriteLine($"Hello there {me.DisplayName}");
+            // add verifier to session
+            _context.HttpContext.Session.SetString("SpotifyVerifier", verifier);
 
-            await foreach (
-              var playlist in spotify.Paginate(await spotify.Playlists.CurrentUsers())
+            var loginRequest = new LoginRequest(
+              new Uri("https://localhost:7092/Spotify"),
+              _configuration["Spotify:ClientID"],
+              LoginRequest.ResponseType.Code
             )
             {
-                Console.WriteLine(playlist.Name);
+                CodeChallengeMethod = "S256",
+                CodeChallenge = challenge,
+                Scope = [Scopes.PlaylistModifyPublic, Scopes.UserLibraryModify, Scopes.UserTopRead]
+            };
+            var uri = loginRequest.ToUri();
+
+
+            return Redirect(uri.ToString());
+        }
+
+        [HttpGet("/Spotify")]
+        // This method should be called from your web-server when the user visits "https://localhost:7092/Spotify"
+        public async Task<RedirectToActionResult> GetCallback(string code)
+        {
+            // catch user cancels
+            if (code == null)
+            {
+                return RedirectToAction("Index", "Home");
             }
 
-            return View();
+            var uri = new Uri("https://localhost:7092/Spotify");
+
+            var initialResponse = await new OAuthClient().RequestToken(
+            new PKCETokenRequest(_configuration["Spotify:ClientID"], code, uri, _context.HttpContext.Session.GetString("SpotifyVerifier")));
+
+            var authenticator = new PKCEAuthenticator(_configuration["Spotify:ClientID"], initialResponse);
+
+            var config = SpotifyClientConfig.CreateDefault().WithAuthenticator(authenticator);
+
+            var spotify = new SpotifyClient(config);
+
+            // get user profile
+            var user = await spotify.UserProfile.Current();
+
+            // add user to session
+            _context.HttpContext.Session.SetString("SpotifyUser", JsonConvert.SerializeObject(user));
+
+            return RedirectToAction("Index", "Generate");
         }
+
     }
 }
